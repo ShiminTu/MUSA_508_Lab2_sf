@@ -23,7 +23,7 @@ set.seed(717)
 This assignment if for you to complete a short version of the lab notes, but you have to complete a number of the steps yourself.
 You will then knit this to a markdown (not an HTML) and push it to your GitHub repo.
 Unlike HTML, the RMarkdown knit to `github_document` can be viewed directly on GitHub.
-You will them email your lab instructor with a link to your repo.
+You will then email your lab instructor with a link to your repo.
 
 Steps in this assignment:
 
@@ -31,11 +31,11 @@ Steps in this assignment:
 
 2.  Find two new variables from the 2019 ACS data to load.
     Use `vars <- load_variables(2019, "acs5")` and `View(vars)` to see all of the variable from that ACS.
-    Note that you should not pick something really obscure like count_38yo_cabinetmakers because you will get lots of NAs.
+    Note that you should not pick something really obsc(https:/ure like count_38yo_cabinetmakers because you will get lots of NAs.
 
 3.  Pick a neighborhood of the City to map.
     You will need to do some googling to figure this out.
-    Use the [PHL Track Explorer](https://data-phl.opendata.arcgis.com/datasets/census-tracts-2010/explore?location=40.002759%2C-75.119097%2C11.91) to get the `GEOID10` number from each parcel and add them to the `myTracts` object below.
+    Use the [PHL Track Explorer]/data-phl.opendata.arcgis.com/datasets/census-tracts-2010/explore?location=40.002759%2C-75.119097%2C11.91) to get the `GEOID10` number from each parcel and add them to the `myTracts` object below.
     This is just like what was done in the exercise, but with a different neighborhood of your choice.
     Remember that all GEOIDs need to be 10-characters long.
 
@@ -64,9 +64,17 @@ Steps in this assignment:
 ## Load data from {tidycensus}
 
 ```{r acs_vars, cache = TRUE, message = FALSE, warning = FALSE, results=FALSE}
-acs_vars <- c( "[PUT YOUR VAR CODES HERE]")
+vars <- load_variables(2019, "acs5")
 
-myTracts <- c("[YOUR TRACTS GEOIDs HERE]")
+View(vars)
+
+acs_vars <- c("B25034_002E", # year structure built 2014 or later
+              "B25035_001E") # median year structure built
+
+myTracts <- c("42101037600",
+              "42101012500",
+              "42101013200",
+              "42101013300")
 
 acsTractsPHL.2019.sf <- get_acs(geography = "tract",
                              year = 2019,
@@ -75,10 +83,11 @@ acsTractsPHL.2019.sf <- get_acs(geography = "tract",
                              state  = "PA",
                              county = "Philadelphia",
                              output = "wide") %>%
-  dplyr::select (GEOID, NAME, all_of(paste0(acs_vars,"E"))) %>%
-  rename ("[RENAME YOUR VARIABLES HERE]") %>%
+  dplyr::select (GEOID, NAME, all_of(acs_vars)) %>%
+  rename (Aft2014 = B25034_002E,
+          MY_structure= B25035_001E) %>%
   mutate(Neighborhood = ifelse(GEOID %in% myTracts,
-                               "[YOUR NEIGHBORHOOD NAME HERE]",
+                               "DREAM",
                                "REST OF PHILADELPHIA"))
 ```
 
@@ -86,24 +95,24 @@ acsTractsPHL.2019.sf <- get_acs(geography = "tract",
 
 ```{r}
 acsTractsPHL.2019.sf <- acsTractsPHL.2019.sf %>% 
-  st_transform(crs = "[PUT THE WGS84 EPSG CODE HERE]")
+  st_transform(crs = "EPSG:4326")
 ```
 
 ## Plot with {ggplot2}
 
 ```{r ggplot_geom_sf, warning = FALSE, echo = FALSE}
 ggplot()+
-  geom_sf(data = acsTractsPHL.2019.sf, aes(fill = "[YOUR VARIABLE NAME HERE]"),
+  geom_sf(data = acsTractsPHL.2019.sf, aes(fill = MY_structure),
           color = "transparent")+
   geom_sf(data = acsTractsPHL.2019.sf %>%
-            filter(Neighborhood == "[YOUR NEIGHBORHOOD NAME HERE]") %>%
+            filter(Neighborhood == "DREAM") %>%
             st_union(),
           color = "white",
           fill = "transparent")+
   # Bonus to figure out different color ramps with scale_fill_viridis()
   labs(
-    title = "[YOUR TITLE HERE]",
-    subtitle = "[YOUR SUBTITLE HERE]",
-    caption = "[YOUR CAPTION HERE]")
+    title = "Median year structure built",
+    subtitle = "",
+    caption = "Data: US Census Bureau, ACS 5-year estimates")
 
 ```
