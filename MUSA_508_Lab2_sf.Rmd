@@ -61,6 +61,7 @@ myTracts <- c("42101023500",
               "42101025600", 
               "42101038800")
 
+#fetch the data
 acsTractsPHL.2016.sf <- get_acs(geography = "tract",
                              year = 2016, 
                              variables = acs_vars, 
@@ -86,7 +87,7 @@ ggplot()+
           color = "transparent")+
   geom_sf(data = acsTractsPHL.2016.sf %>%
             filter(mtAiry == "MT AIRY") %>%
-            st_union(),
+            st_union(), 
           color = "white",
           fill = "transparent")+
   labs(
@@ -357,7 +358,7 @@ head(acsTractsPHL_Income_coords)
 A safer way to add the coordinate column and retain it with the index column `GEOID` without the fear of accidentally reordering the rows is to use `dplyr::mutate` . This assigned the coordinate columns inline and guarantees that they match.
 
 ```{r}
-GEOID_Coords <- acsTractsPHL.2016_centroid %>%
+GEOID_Coords <- acsTractsPHL.2016_centroid %>% #???
   dplyr::mutate(longitude = sf::st_coordinates(.)[,1],
                 latitude = sf::st_coordinates(.)[,2]) %>% 
   st_drop_geometry() %>% 

@@ -71,10 +71,7 @@ View(vars)
 acs_vars <- c("B25034_002E", # year structure built 2014 or later
               "B25035_001E") # median year structure built
 
-myTracts <- c("42101037600",
-              "42101012500",
-              "42101013200",
-              "42101013300")
+myTracts <- c("42101037800","42101018001","42101017900","42101018002","42101037900","42101038200")
 
 acsTractsPHL.2019.sf <- get_acs(geography = "tract",
                              year = 2019,
@@ -87,7 +84,7 @@ acsTractsPHL.2019.sf <- get_acs(geography = "tract",
   rename (Aft2014 = B25034_002E,
           MY_structure= B25035_001E) %>%
   mutate(Neighborhood = ifelse(GEOID %in% myTracts,
-                               "DREAM",
+                               "PORT RICHMOND",
                                "REST OF PHILADELPHIA"))
 ```
 
@@ -105,7 +102,7 @@ ggplot()+
   geom_sf(data = acsTractsPHL.2019.sf, aes(fill = MY_structure),
           color = "transparent")+
   geom_sf(data = acsTractsPHL.2019.sf %>%
-            filter(Neighborhood == "DREAM") %>%
+            filter(Neighborhood == "PORT RICHMOND") %>%
             st_union(),
           color = "white",
           fill = "transparent")+
